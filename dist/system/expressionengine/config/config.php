@@ -11,7 +11,7 @@
 |
 */
 $config['app_version'] = '2.11.2';
-$admin_email = 'ph@fusionweb.co.uk';
+$admin_email = ''; /* enter your email address */
 
 $path = '/home/username'; /* insert account username */
 $public_path = $path.'/public_html';
@@ -189,7 +189,7 @@ $config['banishment_message'] = 'You have exceeded the allowed page load frequen
 
 // Software Registration
 
-$config['license_contact'] = 'info@fusionweb.co.uk';
+$config['license_contact'] = $admin_email;
 $config['license_number'] = '4223-4223-4223-4223';
 
 // Member Preferences
