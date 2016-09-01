@@ -18,7 +18,7 @@ gulp.task('default', ['sass', 'js']);
 
 gulp.task('sass', function(done) {
 	
-	gulp.src('.src/scss/site.scss')
+	gulp.src('./src/scss/site.scss')
 	.pipe(sass())
 	.on('error', sass.logError)
 	.pipe(gulp.dest('./dist/public_html/assets/css/'))
