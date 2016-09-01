@@ -5,7 +5,7 @@
  * @package		com.fusionweb.[SITENAME]
  * @description				
  * @author 		[AUTHOR]
- * @copyright 	Copyright (c) XX/XX/2016
+ * @copyright	Copyright (c) XX/XX/2016
  *
  */	
 
