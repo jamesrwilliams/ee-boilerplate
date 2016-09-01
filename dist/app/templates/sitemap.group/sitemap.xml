@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+	{exp:channel:entries 
+		disable="categories|category_fields|member_data|pagination|custom_fields"
+		channel=""
+		entry_id=""
+		limit="999"
+		status="open"
+		cache="yes"
+		refresh="1440"
+	}
+	<url>
+		<loc>{if page_url}{page_url}{if:else}{comment_url_title_auto_path}{/if}</loc>
+		<lastmod>{edit_date format="{DATE_W3C}"}</lastmod>
+		<changefreq>weekly</changefreq>
+	</url>
+	{/exp:channel:entries}
+</urlset>

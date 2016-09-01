@@ -1,0 +1,23 @@
+{!--
+Site: example.com
+Template: sitemap/index
+===========================================================
+Built by Fusion Design | fusionweb.co.uk
+=========================================================== --}
+
+<ul>
+
+{exp:channel:entries disable="categories|category_fields|member_data|pagination|custom_fields"
+	channel=""
+	limit="999"
+	status="open"
+	cache="yes"
+	refresh="1440"
+}
+
+
+	<li>{if page_url}{page_url}{if:else}{comment_url_title_auto_path}{/if}</li>
+
+{/exp:channel:entries}
+
+</ul>
