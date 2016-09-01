@@ -7,19 +7,23 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
-		<meta name="description" content="{if embed:page_desc != ""}{embed:page_desc}{if:else}{site_desc}{/if}">
+		<meta name="description" content="{if layout:description}{exp:replace_quotes:replace string='{layout:description}'}{if:else}{exp:replace_quotes:replace string='{gv_default-meta-description}'}{/if}">
 		
-		<meta property="og:url"			content="" />
-		<meta property="og:type"        content="" />
-		<meta property="og:title"       content="" />
-		<meta property="og:description" content="" />
-		<meta property="og:image"       content="" />
+		<meta property="og:title" content="{layout:title}">
+		<meta property="og:site_name" content="{site_name}">
+		<meta property="og:description" content="{if layout:description}{exp:replace_quotes:replace string='{layout:description}'}{if:else}{exp:replace_quotes:replace string='{gv_default-meta-description}'}{/if}">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="{current_url}">
+		<meta property="og:image" content="{if layout:image}{layout:image}{if:else}{site_url}assets/img/og-image.jpg{/if}">
 
 		<meta name="twitter:card" content="summary" />
-		<meta name="twitter:site" content="" />
-		<meta name="twitter:creator" content="" />
+		<meta name="twitter:site" content="{current_url}" />
+		<meta name="twitter:creator" content="{layout:title}" />
+		<meta name="twitter:title" content="{layout:title}">
+		<meta name="twitter:description" content="{if layout:description}{exp:replace_quotes:replace string='{layout:description}'}{if:else}{exp:replace_quotes:replace string='{gv_default-meta-description}'}{/if}">
+		<meta name="twitter:image" content="{if layout:image}{layout:image}{if:else}{site_url}assets/img/og-image.jpg{/if}">
 		
-		<title>Site Title</title>
+		<title>{layout:title}</title>
 
 		<!-- Bootstrap -->
 		<link href="/assets/css/site.min.css" rel="stylesheet">

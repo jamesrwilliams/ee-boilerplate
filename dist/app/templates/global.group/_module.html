@@ -1,0 +1,27 @@
+{!--
+Site: example.com
+Template: global/_module
+===========================================================
+Built by Fusion Design | fusionweb.co.uk
+===========================================================
+Embedded in one template: page/index
+=========================================================== --}
+
+{exp:channel:entries
+	channel="module"
+	entry_id="{embed:entry_id}"
+	orderby="date"
+	sort="desc"
+	limit="1"
+	disable="categories|category_fields|member_data|pagination"
+	cache="yes"
+	refresh="1440"
+}
+	{exp:switchee variable="{module-type}" parse="inward"}
+
+		{case value=""}
+
+		{/case}
+
+	{/exp:switchee}
+{/exp:channel:entries}

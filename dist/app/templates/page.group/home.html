@@ -1,0 +1,28 @@
+{!--
+Site: example.com
+Template: page/home
+===========================================================
+Built by Fusion Design | fusionweb.co.uk
+=========================================================== --}
+
+{layout="global/_layout"}
+
+{exp:channel:entries
+	channel="page"
+	limit="1"
+	disable="categories|category_fields|member_data|pagination|relationships"
+	cache="yes"
+	refresh="1440"
+	require_entry="yes"
+}
+
+	{if no_results}
+		{redirect="404"}
+	{/if}
+
+	{layout:set name="title"}{if page-meta_title}{page-meta_title}{if:else}{title} - {site_name}{/if}{/layout:set}
+	{if page-meta_description}{layout:set name="description"}{page-meta_description}{/layout:set}{/if}
+
+
+
+{/exp:channel:entries}
