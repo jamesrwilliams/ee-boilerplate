@@ -1,0 +1,28 @@
+/* ===============================================================
+	
+				Mixins - SCSS Utility Functions		
+	
+=============================================================== */
+
+//	Border radius shorthand
+//	@include border-radius(top left, top right, bottom right, bottom left);
+//
+//	Usage Example
+//	=============
+//
+//	div.box {
+//	
+//		@inlcude border-radius(10px);
+//	
+//	}
+//
+
+@mixin border-radius($radius) {
+
+	border-radius: $radius;
+	-webkit-border-radius: $radius;
+	-moz-border-radius: $radius;
+	-ms-border-radius: $radius;
+	-o-border-radius: $radius;
+	
+}
