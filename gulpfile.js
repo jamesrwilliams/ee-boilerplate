@@ -1,11 +1,12 @@
 var gulp = require('gulp');
 var gutil = require('gulp-util');
 var concat = require('gulp-concat');
-var minify = require('gulp-minify');
 var uglify = require('gulp-uglifyjs');
 var sass = require('gulp-sass');
 var minifyCss = require('gulp-minify-css');
 var rename = require('gulp-rename');
+var del = require('del');
+var vinylPaths = require('vinyl-paths');
 
 var paths = {
 	
@@ -27,6 +28,18 @@ gulp.task('sass', function(done) {
 	}))
 	.pipe(rename({ extname: '.min.css' }))
 	.pipe(gulp.dest('./dist/public_html/assets/css/'))
+	.on('end', done);
+	
+});
+
+gulp.task('init', function(done){
+	
+	gulp.src('./src/config.php')
+	.pipe(gulp.dest('./dist/system/expressionengine/config/'))
+	.on('end', done),
+	
+	gulp.src('./src/config.php')
+	.pipe(vinylPaths(del))
 	.on('end', done);
 	
 });
