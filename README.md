@@ -10,7 +10,7 @@
 
 ## Remote Setup
 
-1. Optionally add an encryption key to `$config['encryption_key']` ([see docs](https://docs.expressionengine.com/v2/general/system_configuration_overrides.html#encryption-key)) in [config.php](dist/system/expressionengine/config/config.php). 
+1. Optionally add an encryption key to `$config['encryption_key']` ([see docs](https://docs.expressionengine.com/v2/general/system_configuration_overrides.html#encryption-key)) in [config.php](dist/system/expressionengine/config/config.php#L30). 
 	Get a randomly generated key from [this page](https://www.grc.com/passwords.htm). The *63 random alpha-numeric characters* will do.
 
 ## Structure
