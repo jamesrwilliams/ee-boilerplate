@@ -5,16 +5,27 @@
 // *************************************
 //
 // Available tasks:
-//   `gulp`
-//
+//   'gulp'
+//	 'gulp sass'
+//   'gulp js'
+//   'gulp watch'
 //
 // -------------------------------------
 //   Modules
 // -------------------------------------
 //
-// gulp              : The streaming build system
+// gulp              	: The streaming build system
+// gulp-util			: 
+// gulp-concat			: 
+// gulp-uglifyjs		: 
+// gulp-sass			: 
+// gulp-minify-css		: 
+// gulp-rename			: 
+// gulp-rename			: 
+// del					: 
+// vinyl-paths			: 
 //
-//
+// *************************************
 
 var gulp = require('gulp');
 var gutil = require('gulp-util');
@@ -67,11 +78,10 @@ gulp.task('sass', function(done) {
 
 gulp.task('init', function(done){
 	
-	// TODO: Move System to parent directory
+	// TODO: Move /system/ to parent directory
+	// TODO: Grab verison number and replace in custom version in config.php files
 	
-	// Update config file from src version to new one
-	
-	// TODO: Grab verison number and replace in custom version
+	// Update config.php file from src version to new one
 	
 	gulp.src('./src/config.php')
 	.pipe(gulp.dest('./dist/system/expressionengine/config/')),
@@ -79,7 +89,7 @@ gulp.task('init', function(done){
 	gulp.src('./src/config.php')
 	.pipe(vinylPaths(del)),
 	
-	// Rename ExpressionEngine 'images' default folder to 'assets'
+	// Rename ExpressionEngine 'images' folder to 'assets'
 	
 	gulp.src('./dist/public_html/images/*')
 	.pipe(gulp.dest("./dist/public_html/assets/")),
@@ -87,7 +97,7 @@ gulp.task('init', function(done){
 	gulp.src('./dist/public_html/images/')
 	.pipe(vinylPaths(del)),
 	
-	// Move the uploads folder move to its parent directory
+	// Move the uploads folder to its parent directory
 	
 	gulp.src('./dist/public_html/assets/uploads/')
 	.pipe(gulp.dest('./dist/public_html/')),
