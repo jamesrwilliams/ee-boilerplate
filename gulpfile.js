@@ -27,16 +27,19 @@
 //
 // *************************************
 
-var gulp = require('gulp');
-var gutil = require('gulp-util');
-var concat = require('gulp-concat');
-var uglify = require('gulp-uglifyjs');
-var sass = require('gulp-sass');
-var minifyCss = require('gulp-minify-css');
-var rename = require('gulp-rename');
-var del = require('del');
-var vinylPaths = require('vinyl-paths');
-var rename = require('gulp-rename');
+var gulp = 			require('gulp');
+var gutil = 		require('gulp-util');
+var concat = 		require('gulp-concat');
+var uglify = 		require('gulp-uglifyjs');
+var sass = 			require('gulp-sass');
+var minifyCss = 	require('gulp-minify-css');
+var rename = 		require('gulp-rename');
+var del = 			require('del');
+var vinylPaths = 	require('vinyl-paths');
+var rename = 		require('gulp-rename');
+var replace = 		require('gulp-replace');
+var find = 			require('gulp-find');
+var contains = 		require('gulp-contains');
 
 var paths = {
 	
@@ -44,6 +47,8 @@ var paths = {
 	js: ['./src/js/**/*.js']
 	
 };
+
+var version_number = "Not Found";
 
 // -------------------------------------
 //   Task: default
@@ -71,6 +76,30 @@ gulp.task('sass', function(done) {
 });
 
 // -------------------------------------
+//   Task: debug
+// -------------------------------------
+
+gulp.task('debug', function(done){
+	
+	gulp.src('./dist/system/expressionengine/config/config.php')
+	.pipe(contains({
+            search: "/app_version/**",
+            onFound: function (string, file, cb) {
+                // string is the string that was found 
+                // file is the vinyl file object 
+                // cb is the through2 callback 
+                
+                console.log(string);
+ 
+                // return false to continue the stream
+                
+            }
+    }))
+	gulp.on('end', done);
+	
+});
+
+// -------------------------------------
 //   Task: init
 // -------------------------------------
 
@@ -78,10 +107,17 @@ gulp.task('sass', function(done) {
 
 gulp.task('init', function(done){
 	
-	// TODO: Move /system/ to parent directory
 	// TODO: Grab verison number and replace in custom version in config.php files
 	
-	// Update config.php file from src version to new one
+	// Move /system/ to parent directory
+	
+	gulp.src('./dist/public_html/system/')
+	.pipe(gulp.dest("./dist/")),
+	
+	gulp.src('./dist/public_html/system/')
+	.pipe(vinylPaths(del)),
+	
+	// Move the boilerplate config.php into position
 	
 	gulp.src('./src/config.php')
 	.pipe(gulp.dest('./dist/system/expressionengine/config/')),
