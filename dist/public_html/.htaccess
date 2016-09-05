@@ -1,19 +1,21 @@
 <IfModule mod_rewrite.c>
+	
 	Options +FollowSymlinks
-  RewriteEngine On
-
+	RewriteEngine On
+	
 	# redirect www to non-www
 	#RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
 	#RewriteRule ^(.*)$ http://%1/$1 [R=301,L]
-
+	
 	# redirect non-www to www
 	#RewriteCond %{HTTP_HOST} !^www\. [NC]
 	#RewriteRule ^(.*)$ http://www.%{HTTP_HOST}/$1 [R=301,L]
-
+	
 	# route all requests through index.php
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteRule ^(.*)$ /index.php?/$1 [L]
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteRule ^(.*)$ /index.php?/$1 [L]
+
 </IfModule>
 
 AddDefaultCharset utf-8
@@ -41,9 +43,11 @@ AddCharset utf-8 .html .css .js .xml .json .rss
 
 	# Javascript
 	ExpiresByType application/javascript "access plus 1 year"
+
 </IfModule>
 
 <IfModule mod_deflate.c>
+
 	# Compress HTML, CSS, JavaScript, Text, XML and fonts
 	AddOutputFilterByType DEFLATE application/javascript
 	AddOutputFilterByType DEFLATE application/rss+xml
@@ -72,4 +76,5 @@ AddCharset utf-8 .html .css .js .xml .json .rss
 	BrowserMatch ^Mozilla/4\.0[678] no-gzip
 	BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
 	Header append Vary User-Agent
+	
 </IfModule>

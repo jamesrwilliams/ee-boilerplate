@@ -40,6 +40,9 @@ var rename = 		require('gulp-rename');
 var replace = 		require('gulp-replace');
 var find = 			require('gulp-find');
 var contains = 		require('gulp-contains');
+var gulpSequence = 	require('gulp-sequence');
+
+/* Set paths to be watched */
 
 var paths = {
 	
@@ -47,8 +50,6 @@ var paths = {
 	js: ['./src/js/**/*.js']
 	
 };
-
-var version_number = "Not Found";
 
 // -------------------------------------
 //   Task: default
@@ -81,72 +82,82 @@ gulp.task('sass', function(done) {
 
 gulp.task('debug', function(done){
 	
-	gulp.src('./dist/system/expressionengine/config/config.php')
-	.pipe(contains({
-            search: "/app_version/**",
-            onFound: function (string, file, cb) {
-                // string is the string that was found 
-                // file is the vinyl file object 
-                // cb is the through2 callback 
-                
-                console.log(string);
- 
-                // return false to continue the stream
-                
-            }
-    }))
 	gulp.on('end', done);
 	
 });
 
 // -------------------------------------
-//   Task: init
+// Task: init
+// ==========================
+//
+// Subtasks are required to run in series.
+//
+// Sub Tasks:
+//
+// init:move:* 	- Moves system folders
+// init:clear:*	- Clears the duped folders
+//
 // -------------------------------------
 
-//*
+gulp.task('init', function (done) {
+  
+  	// Run the main git init sequence
+  
+	gulpSequence('init:move:system', 'init:move:assets', 'init:move:uploads', 'init:move:config', ['init:clear:images', 'init:clear:system'], done);
+  
+});
 
-gulp.task('init', function(done){
+// *************************************
+
+gulp.task('init:move:system', function(done){
+		
+	gulp.src('./dist/public_html/system/**/*')
+	.pipe(gulp.dest("./dist/system/"))
+	.on('end', done);
 	
-	// TODO: Grab verison number and replace in custom version in config.php files
+});
+
+gulp.task('init:move:assets', function(done){
 	
-	// Move /system/ to parent directory
+	gulp.src('./dist/public_html/images/**/*')
+	.pipe(gulp.dest("./dist/public_html/assets/"))
+	.on('end', done);
 	
-	gulp.src('./dist/public_html/system/')
-	.pipe(gulp.dest("./dist/")),
-	
-	gulp.src('./dist/public_html/system/')
-	.pipe(vinylPaths(del)),
-	
-	// Move the boilerplate config.php into position
+});
+
+gulp.task('init:move:config', function(done){
 	
 	gulp.src('./src/config.php')
-	.pipe(gulp.dest('./dist/system/expressionengine/config/')),
+	.pipe(gulp.dest('./dist/system/expressionengine/config/'))
+	.on('end', done);
 	
-	gulp.src('./src/config.php')
-	.pipe(vinylPaths(del)),
-	
-	// Rename ExpressionEngine 'images' folder to 'assets'
-	
-	gulp.src('./dist/public_html/images/*')
-	.pipe(gulp.dest("./dist/public_html/assets/")),
-	
-	gulp.src('./dist/public_html/images/')
-	.pipe(vinylPaths(del)),
-	
-	// Move the uploads folder to its parent directory
+});
+
+gulp.task('init:move:uploads', function(done){
 	
 	gulp.src('./dist/public_html/assets/uploads/')
-	.pipe(gulp.dest('./dist/public_html/')),
+	.pipe(gulp.dest('./dist/public_html/'))
+	.on('end', done);
 	
-	gulp.src('./dist/public_html/assets/uploads')
+});
+
+gulp.task('init:clear:images', function(done){
+	
+	gulp.src('./dist/public_html/images/')
 	.pipe(vinylPaths(del))
 	.on('end', done);
 	
-	// TODO: Create /img/ folder within assets
-
 });
 
-// */
+gulp.task('init:clear:system', function(done){
+	
+	gulp.src('./dist/public_html/system/')
+	.pipe(vinylPaths(del))
+	.on('end', done);
+	
+});
+
+// *************************************
 
 // -------------------------------------
 //   Task: js
