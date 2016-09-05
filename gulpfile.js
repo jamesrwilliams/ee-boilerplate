@@ -16,34 +16,30 @@
 //
 // gulp              	: The streaming build system
 // gulp-util			: 
-// gulp-concat			: 
-// gulp-uglifyjs		: 
-// gulp-sass			: 
-// gulp-minify-css		: 
-// gulp-rename			: 
-// gulp-rename			: 
-// del					: 
-// vinyl-paths			: 
-//
+// gulp-sass
+// gulp-find
+// gulp-concat
+// gulp-rename
+// gulp
+// 
 // *************************************
 
 var gulp = 			require('gulp');
 var gutil = 		require('gulp-util');
-var concat = 		require('gulp-concat');
-var uglify = 		require('gulp-uglifyjs');
 var sass = 			require('gulp-sass');
-var minifyCss = 	require('gulp-minify-css');
-var rename = 		require('gulp-rename');
-var del = 			require('del');
-var vinylPaths = 	require('vinyl-paths');
+var find = 			require('gulp-find');
+var concat = 		require('gulp-concat');
 var rename = 		require('gulp-rename');
 var replace = 		require('gulp-replace');
-var find = 			require('gulp-find');
 var contains = 		require('gulp-contains');
 var gulpSequence = 	require('gulp-sequence');
+var uglify = 		require('gulp-uglifyjs');
+var minifyCss = 	require('gulp-minify-css');
+
+var del = 			require('del');
+var vinylPaths = 	require('vinyl-paths');
 
 /* Set paths to be watched */
-
 var paths = {
 	
 	sass: ['./src/scss/**/*.scss'],
@@ -62,7 +58,7 @@ gulp.task('default', ['sass', 'js']);
 // -------------------------------------
 
 gulp.task('sass', function(done) {
-	
+		
 	gulp.src('./src/scss/site.scss')
 	.pipe(sass())
 	.on('error', sass.logError)
@@ -76,15 +72,6 @@ gulp.task('sass', function(done) {
 	
 });
 
-// -------------------------------------
-//   Task: debug
-// -------------------------------------
-
-gulp.task('debug', function(done){
-	
-	gulp.on('end', done);
-	
-});
 
 // -------------------------------------
 // Task: init
@@ -168,8 +155,7 @@ gulp.task('js', function(done) {
 	gulp.src('./src/js/*.js')
     .pipe(concat('site.js'))
     .pipe(uglify('site.min.js', {
-    	
-    	
+    
     	outSourceMap: true
     
     }))
