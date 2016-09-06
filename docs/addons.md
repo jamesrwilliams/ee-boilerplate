@@ -17,6 +17,7 @@
 - [Field Pack](https://devot-ee.com/add-ons/field-pack)
 - Replace Quotes
 - [Switchee](https://devot-ee.com/add-ons/switchee)
+- [Custom System Messages](https://devot-ee.com/add-ons/custom-system-messages)
 
 #Optional add-ons
 - [Low Search](https://devot-ee.com/add-ons/low-search)
