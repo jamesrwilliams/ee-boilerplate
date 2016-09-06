@@ -1,0 +1,6 @@
+Core Changes Made
+=================
+
+Updated 06/09/16: /home/gloucestershirer/public_html/system/codeigniter/system/core/Utf8.php #47
+
+See https://ellislab.com/forums/archive/viewthread/238342
