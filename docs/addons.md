@@ -33,3 +33,4 @@
 - [Stash](https://devot-ee.com/add-ons/stash)
 - [CP Menu Master](https://devot-ee.com/add-ons/cp-menu-master)
 - [Freemember](https://github.com/devdemon/freemember)
+- [Deeploy Helper](https://www.hopstudios.com/software/deeploy_helper)
