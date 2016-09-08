@@ -1,22 +1,40 @@
 # ExpressionEngine (EE) Boilerplate
 
-## Setup
+Boilerplate for Fusion ExpressionEngine web projects.
 
-1. Download this boilerplate and unzip into your project root
+# Setup
 
-2. Update project details in `package.json` and `site.js` and `site.scss`.
+### 1. Download boilerplate
 
-3. Install packages: `$ npm install`
+Download and unzip into project folder.
 
-4. Download EE files and unzip into *dist/public_html*
+### 2. Update project details
 
-5. Run `$ gulp init` to setup directory. Moves `/system/` above `/public_html/`. Renames `/images/` to `/assets/`. Moves uploads to `/public_html/`.
+Reference details can be found `package.json` and `src/site.js` and `src/site.scss`.
 
-6. Begin gulp `$ gulp watch`
+### 3. Install packages: 
+```
+$ npm install
+```
+### 4. Download EE files
+
+Download from [ellislab.com](https://store.ellislab.com/manage) and then unzip the source files into `dist/public_html`.
+
+### 5. Setup directory using
+```
+$ gulp init
+```
+
+This moves the ExpressionEngine system directory to about `dist/public_html`, renames the images directory to assets, and moves the uploads directory out of assets to public_html. 
+
+### 6. Begin gulp 
+```
+$ gulp watch
+```
 
 ## Additional Steps
 
-Optionally add an encryption key to `$config['encryption_key']` ([see docs](https://docs.expressionengine.com/v2/general/system_configuration_overrides.html#encryption-key)) in [config.php](dist/system/expressionengine/config/config.php#L30). Get a randomly generated key from [this page](https://www.grc.com/passwords.htm). The *63 random alpha-numeric characters* will do.
+Optionally add an encryption key to `$config['encryption_key']` ([see docs](https://docs.expressionengine.com/v2/general/system_configuration_overrides.html#encryption-key)) in [config.php](src/config.php#L30). Get a randomly generated key from [this page](https://www.grc.com/passwords.htm). The *63 random alpha-numeric characters* will do.
 
 ## Structure
 
@@ -30,16 +48,16 @@ _
 |     |
 |     |- templates/
 |        |
-|        |- global.group __________
-|        |- page.group ____________
-|        |- sitemap.group _________
+|        |- global.group __________ Layouts and modules
+|        |- page.group
+|        |- sitemap.group _________ HTML & XML sitemaps
 |
 |  |- public_html/
 |     |
 |     |- assets ___________________ Contains production ready minified css/js/imgs etc.
 |     |
-|     |- .htaccess ________________  
-|     |- robots.txt _______________ 
+|     |- .htaccess
+|     |- robots.txt
 |
 |- docs/
 |  |
