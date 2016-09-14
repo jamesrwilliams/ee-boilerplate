@@ -67,6 +67,8 @@ $config['tmpl_file_basepath'] = $path.'/app/templates/';
 $config['hidden_template_indicator'] = '_';
 $config['hidden_template_404'] = 'y';
 $config['smart_static_parsing'] = 'y';
+$config['template_group'] = 'page';
+$config['template'] = 'home';
 
 // Global Channel Preferences
 
