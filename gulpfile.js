@@ -210,7 +210,7 @@ gulp.task('util', function(done){
 
 gulp.task('util:templates', function(done){
 	
-	gulp.src('./src/templates/*')
+	gulp.src('./src/templates/**/*')
 	.pipe(gulp.dest('./dist/app/templates/default_site/'))
 	.on('end', done);
 	
