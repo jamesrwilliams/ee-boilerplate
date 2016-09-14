@@ -25,7 +25,7 @@ Download from [ellislab.com](https://store.ellislab.com/manage) and then unzip t
 $ gulp init
 ```
 
-This moves the ExpressionEngine system directory to about `dist/public_html`, renames the images directory to assets, and moves the uploads directory out of assets to public_html. 
+This moves the ExpressionEngine system directory to above `dist/public_html`, renames the images directory to assets, and moves the uploads directory out of assets to public_html. 
 
 ### 6. Begin gulp 
 ```
