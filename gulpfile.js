@@ -4,25 +4,11 @@
 //
 // *************************************
 //
-// Available tasks:
-//   'gulp'
-//	 'gulp sass'
-//   'gulp js'
-//   'gulp watch'
+// Run $ gulp --tasks to get full list of available tasks.
 //
 // -------------------------------------
 //   Modules
 // -------------------------------------
-//
-// gulp              	: The streaming build system
-// gulp-util			: 
-// gulp-sass
-// gulp-find
-// gulp-concat
-// gulp-rename
-// gulp
-// 
-// *************************************
 
 var gulp = 			require('gulp');
 var gutil = 		require('gulp-util');
@@ -31,13 +17,17 @@ var find = 			require('gulp-find');
 var concat = 		require('gulp-concat');
 var rename = 		require('gulp-rename');
 var replace = 		require('gulp-replace');
+
 var contains = 		require('gulp-contains');
 var gulpSequence = 	require('gulp-sequence');
 var uglify = 		require('gulp-uglifyjs');
-var minifyCss = 	require('gulp-minify-css');
+var cleanCSS = 		require('gulp-clean-css');
+var bulkSass = 		require('gulp-sass-bulk-import');
 
 var del = 			require('del');
 var vinylPaths = 	require('vinyl-paths');
+
+// *************************************
 
 /* Set paths to be watched */
 var paths = {
@@ -60,12 +50,16 @@ gulp.task('default', ['sass', 'js']);
 gulp.task('sass', function(done) {
 		
 	gulp.src('./src/scss/site.scss')
-	.pipe(sass())
+	.pipe(bulkSass())
+	.pipe(sass({
+		
+		outputStyle: 'compressed',
+		includePaths: ['src/scss']
+		
+	}))
 	.on('error', sass.logError)
 	.pipe(gulp.dest('./dist/public_html/assets/css/'))
-	.pipe(minifyCss({
-		keepSpecialComments: 0
-	}))
+	.pipe(cleanCSS({compatibility: 'ie8'}))
 	.pipe(rename({ extname: '.min.css' }))
 	.pipe(gulp.dest('./dist/public_html/assets/css/'))
 	.on('end', done);
@@ -94,7 +88,7 @@ gulp.task('init', function (done) {
   
 });
 
-// *************************************
+// ************* SUBTASKS **************
 
 gulp.task('init:move:system', function(done){
 		
@@ -144,13 +138,21 @@ gulp.task('init:clear:system', function(done){
 	
 });
 
-// *************************************
+// ********** END SUBTASKS *************
 
 // -------------------------------------
 //   Task: js
 // -------------------------------------
 
 gulp.task('js', function(done) {
+	
+    gulpSequence('js:compile', 'js:vendor', done);
+
+});
+
+// ************* SUBTASKS **************
+
+gulp.task('js:compile', function(done){
 	
 	gulp.src('./src/js/*.js')
     .pipe(concat('site.js'))
@@ -163,6 +165,16 @@ gulp.task('js', function(done) {
     .on('end', done);
 	
 });
+
+gulp.task('js:vendor', function(done){
+	
+	gulp.src('./src/js/vendor/*.js')
+    .pipe(gulp.dest('./dist/public_html/assets/js/vendor/'))
+    .on('end', done);
+	
+});
+
+// ********** END SUBTASKS *************
 
 // -------------------------------------
 //   Task: watch
