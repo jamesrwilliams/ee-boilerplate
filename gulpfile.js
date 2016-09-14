@@ -27,24 +27,36 @@ var bulkSass = 		require('gulp-sass-bulk-import');
 var del = 			require('del');
 var vinylPaths = 	require('vinyl-paths');
 
-// *************************************
+/* Set paths to be watched for gulp watch */
 
-/* Set paths to be watched */
 var paths = {
 	
 	sass: ['./src/scss/**/*.scss'],
-	js: ['./src/js/**/*.js']
+	js: ['./src/js/**/*.js'],
+	templates: ['./src/templates/*']
 	
 };
 
 // -------------------------------------
-//   Task: default
+// Task: default
+// ==========================
+//
+// Fun starts here folks
+//
 // -------------------------------------
 
 gulp.task('default', ['sass', 'js']);
 
 // -------------------------------------
-//   Task: sass
+// Task: sass
+// ==========================
+//
+// Subtasks are required to run in series.
+//
+// Sub Tasks:
+//
+// N/A
+//
 // -------------------------------------
 
 gulp.task('sass', function(done) {
@@ -84,11 +96,9 @@ gulp.task('init', function (done) {
   
   	// Run the main git init sequence
   
-	gulpSequence('init:move:system', 'init:move:assets', 'init:move:uploads', 'init:move:config', ['init:clear:images', 'init:clear:system'], done);
+	gulpSequence('init:move:system', 'init:move:assets', 'init:move:uploads', 'init:move:config', 'util:templates', ['init:clear:images', 'init:clear:system'], done);
   
 });
-
-// ************* SUBTASKS **************
 
 gulp.task('init:move:system', function(done){
 		
@@ -138,10 +148,17 @@ gulp.task('init:clear:system', function(done){
 	
 });
 
-// ********** END SUBTASKS *************
-
 // -------------------------------------
-//   Task: js
+// Task: js
+// ==========================
+//
+// Subtasks are required to run in series.
+//
+// Sub Tasks:
+//
+// init:compile - 
+// init:vendor	- 
+//
 // -------------------------------------
 
 gulp.task('js', function(done) {
@@ -149,8 +166,6 @@ gulp.task('js', function(done) {
     gulpSequence('js:compile', 'js:vendor', done);
 
 });
-
-// ************* SUBTASKS **************
 
 gulp.task('js:compile', function(done){
 	
@@ -174,15 +189,49 @@ gulp.task('js:vendor', function(done){
 	
 });
 
-// ********** END SUBTASKS *************
+// -------------------------------------
+// Task: util
+// ==========================
+//
+// Subtasks are required to run in series.
+//
+// Sub Tasks:
+//
+// util:templates - Moves template files
+//
+// -------------------------------------
+
+gulp.task('util', function(done){
+	
+	// No Primary Task
+	console.log("\nHonk! Goose egg.\n");
+	
+});
+
+gulp.task('util:templates', function(done){
+	
+	gulp.src('./src/templates/*')
+	.pipe(gulp.dest('./dist/app/templates/default_site/'))
+	.on('end', done);
+	
+});
 
 // -------------------------------------
-//   Task: watch
+// Task: watch
+// ==========================
+//
+// Subtasks are required to run in series.
+//
+// Sub Tasks:
+//
+// N/A
+//
 // -------------------------------------
 
 gulp.task('watch', function() {
 	
 	gulp.watch(paths.sass, ['sass']);
 	gulp.watch(paths.js, ['js']);
+	gulp.watch(paths.templates, ['init:move:templates']);
 	
 });
