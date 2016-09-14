@@ -1,4 +1,8 @@
 node_modules
 **/.sass-cache/*
 **/.DS_Store
+
 dist/*
+!dist/public_html/.htaccess
+!dist/public_html/robots.txt
+!dist/hacks.txt
