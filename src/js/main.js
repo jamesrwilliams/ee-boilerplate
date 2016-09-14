@@ -8,7 +8,3 @@
  * @copyright	Copyright (c) XX/XX/2016
  *
  */	
-
-var version = 1;
-
-console.log("Hello World");

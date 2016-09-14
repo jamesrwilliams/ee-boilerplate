@@ -18,6 +18,8 @@ var concat = 		require('gulp-concat');
 var rename = 		require('gulp-rename');
 var replace = 		require('gulp-replace');
 
+var sourcemaps = 	require('gulp-sourcemaps');
+
 var contains = 		require('gulp-contains');
 var gulpSequence = 	require('gulp-sequence');
 var uglify = 		require('gulp-uglifyjs');
@@ -26,6 +28,20 @@ var bulkSass = 		require('gulp-sass-bulk-import');
 
 var del = 			require('del');
 var vinylPaths = 	require('vinyl-paths');
+
+var devConfig = 	require('./developer.json');
+
+var today = new Date;
+var dd = today.getDate(); 
+var mm = today.getMonth()+1;
+if(mm < 10){ mm = "0" + mm; }
+var yyyy = today.getFullYear();
+
+var date = dd + "/" + mm + "/" + yyyy + " @ " + today.getHours() + ":" + today.getMinutes();
+
+var dateString = /@date( )?.*/g;
+var projectString = /@project( )?.*/g;
+var authorString = /@author( )?.*/g;
 
 /* Set paths to be watched for gulp watch */
 
@@ -63,6 +79,7 @@ gulp.task('sass', function(done) {
 		
 	gulp.src('./src/scss/site.scss')
 	.pipe(bulkSass())
+	.pipe(sourcemaps.init())
 	.pipe(sass({
 		
 		outputStyle: 'compressed',
@@ -70,9 +87,12 @@ gulp.task('sass', function(done) {
 		
 	}))
 	.on('error', sass.logError)
-	.pipe(gulp.dest('./dist/public_html/assets/css/'))
-	.pipe(cleanCSS({compatibility: 'ie8'}))
 	.pipe(rename({ extname: '.min.css' }))
+	.pipe(sourcemaps.write('./', {
+		
+		includeContent: false
+		
+	}))
 	.pipe(gulp.dest('./dist/public_html/assets/css/'))
 	.on('end', done);
 	
@@ -96,7 +116,16 @@ gulp.task('init', function (done) {
   
   	// Run the main git init sequence
   
-	gulpSequence('init:move:system', 'init:move:assets', 'init:move:uploads', 'init:move:config', 'util:templates', ['init:clear:images', 'init:clear:system'], done);
+	gulpSequence(
+	
+		'init:move:system', 
+		'init:move:assets', 
+		'init:move:uploads', 
+		'init:move:config', 
+		'util:templates', 
+		['init:clear:images', 'init:clear:system'],
+		
+	done);
   
 });
 
@@ -205,6 +234,13 @@ gulp.task('util', function(done){
 	
 	// No Primary Task
 	console.log("\nHonk! Goose egg.\n");
+		
+	gulp.src('./src/scss/site.scss')
+	.pipe(replace(dateString, "@date " + date))
+	.pipe(replace(projectString, "@project " + devConfig.projectName))
+	.pipe(replace(authorString, "@author " + devConfig.author))
+	.pipe(gulp.dest('./src/scss/'))
+	.on('end', done);
 	
 });
 
