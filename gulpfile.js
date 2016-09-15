@@ -75,6 +75,113 @@ var paths = {
 gulp.task('default', ['sass', 'js']);
 
 // -------------------------------------
+// Task: config
+// ==========================
+//
+// Subtasks are required to run in series.
+//
+// -------------------------------------
+
+
+gulp.task('config', function(done){
+	
+	gulpSequence(
+	
+		'config:move:system', 
+		'config:move:assets', 
+		'config:move:uploads',
+		'config:clear',
+		
+	done);
+	
+});
+
+gulp.task('config:move:system', function(done){
+		
+	gulp.src('./dist/public_html/system/**/*')
+	.pipe(gulp.dest("./dist/system/"))
+	.on('end', done);
+	
+});
+
+gulp.task('config:move:assets', function(done){
+	
+	gulp.src('./dist/public_html/images/**/*')
+	.pipe(gulp.dest("./dist/public_html/assets/"))
+	.on('end', done);
+	
+});
+
+gulp.task('config:move:uploads', function(done){
+	
+	gulp.src('./dist/public_html/assets/uploads/')
+	.pipe(gulp.dest('./dist/public_html/'))
+	.on('end', done);
+	
+});
+
+gulp.task('config:clear', function(){
+	
+	return del([
+		
+		'./dist/public_html/images/',
+   		'./dist/public_html/system/'
+	
+	]);
+	
+});
+
+// -------------------------------------
+// Task: setup
+// ==========================
+//
+// Subtasks are required to run in series.
+//
+// Sub Tasks:
+//
+// init:move:* 	- Moves system folders
+// init:clear:*	- Clears the duped folders
+//
+// -------------------------------------
+
+gulp.task('setup', function(done){
+	
+	gulpSequence(
+	
+		'setup:update', 
+		'setup:move:config', 
+		'util:templates',
+		
+	done);
+	
+});
+
+gulp.task('setup:update', function(done){
+	
+	gulp.src('./src/config.php')
+	.pipe(replace(configVersion, "$config['app_version'] = '" + devConfig.eeVersion + "';"))
+	.pipe(replace(configAdmin, "$admin_email = '" + devConfig.adminEmail + "';"))
+	.pipe(replace(configPath, "$path = 'home/username/" + devConfig.accountName + "';"))
+	.pipe(gulp.dest('./src/')),
+	
+	gulp.src('./dist/public_html/index.php')
+	.pipe(replace(configSysPath, "$system_path = '../system';"))
+	.pipe(gulp.dest('./dist/public_html/'))
+	.on('end', done);
+	
+});
+
+gulp.task('setup:move:config', function(done){
+	
+	gulp.src('./src/config.php')
+	.pipe(gulp.dest('./dist/system/expressionengine/config/'))
+	.on('end', done);
+	
+});
+
+
+
+// -------------------------------------
 // Task: sass
 // ==========================
 //
@@ -105,85 +212,6 @@ gulp.task('sass', function(done) {
 		
 	}))
 	.pipe(gulp.dest('./dist/public_html/assets/css/'))
-	.on('end', done);
-	
-});
-
-
-// -------------------------------------
-// Task: init
-// ==========================
-//
-// Subtasks are required to run in series.
-//
-// Sub Tasks:
-//
-// init:move:* 	- Moves system folders
-// init:clear:*	- Clears the duped folders
-//
-// -------------------------------------
-
-gulp.task('init', function (done) {
-  
-  	// Run the main git init sequence
-  
-	gulpSequence(
-	
-		'init:move:system', 
-		'init:move:assets', 
-		'init:move:uploads', 
-		'init:move:config', 
-		'util:templates', 
-		['init:clear:images', 'init:clear:system'],
-		
-	done);
-  
-});
-
-gulp.task('init:move:system', function(done){
-		
-	gulp.src('./dist/public_html/system/**/*')
-	.pipe(gulp.dest("./dist/system/"))
-	.on('end', done);
-	
-});
-
-gulp.task('init:move:assets', function(done){
-	
-	gulp.src('./dist/public_html/images/**/*')
-	.pipe(gulp.dest("./dist/public_html/assets/"))
-	.on('end', done);
-	
-});
-
-gulp.task('init:move:config', function(done){
-	
-	gulp.src('./src/config.php')
-	.pipe(gulp.dest('./dist/system/expressionengine/config/'))
-	.on('end', done);
-	
-});
-
-gulp.task('init:move:uploads', function(done){
-	
-	gulp.src('./dist/public_html/assets/uploads/')
-	.pipe(gulp.dest('./dist/public_html/'))
-	.on('end', done);
-	
-});
-
-gulp.task('init:clear:images', function(done){
-	
-	gulp.src('./dist/public_html/images/')
-	.pipe(vinylPaths(del))
-	.on('end', done);
-	
-});
-
-gulp.task('init:clear:system', function(done){
-	
-	gulp.src('./dist/public_html/system/')
-	.pipe(vinylPaths(del))
 	.on('end', done);
 	
 });
@@ -252,21 +280,6 @@ gulp.task('util', function(done){
 	
 });
 
-gulp.task('debug', function(done){
-	
-	gulp.src('./src/config.php')
-	.pipe(replace(configVersion, "$config['app_version'] = '" + devConfig.eeVersion + "';"))
-	.pipe(replace(configAdmin, "$admin_email = '" + devConfig.adminEmail + "';"))
-	.pipe(replace(configPath, "$path = 'home/username/" + devConfig.accountName + "';"))
-	.pipe(gulp.dest('./src/')),
-	
-	gulp.src('./dist/public_html/index.php')
-	.pipe(replace(configSysPath, "$system_path = '../system';"))
-	.pipe(gulp.dest('./dist/public_html/'))
-	.on('end', done);
-	
-});
-
 gulp.task('util:bust', function(done){
 	
 	gulp.src('./src/templates/global.group/_layout.html')
@@ -285,7 +298,15 @@ gulp.task('util:update', function(done){
 	.pipe(replace(authorString, "@author		" + devConfig.developer))
 	.pipe(replace(versionString, "@version	" + packageConfig.version))
 	.pipe(replace(descString, "@desc		" + packageConfig.description))
-	.pipe(gulp.dest('./src/scss/'))
+	.pipe(gulp.dest('./src/scss/')),
+	
+	gulp.src('./src/js/main.js')
+	.pipe(replace(dateString, "@date		" + date))
+	.pipe(replace(projectString, "@project	" + packageConfig.name))
+	.pipe(replace(authorString, "@author		" + devConfig.developer))
+	.pipe(replace(versionString, "@version	" + packageConfig.version))
+	.pipe(replace(descString, "@desc		" + packageConfig.description))
+	.pipe(gulp.dest('./src/js/'))
 	.on('end', done);
 	
 });
