@@ -292,13 +292,24 @@ gulp.task('util:bust', function(done){
 
 gulp.task('util:update', function(done){
 	
+	gulpSequence('util:update:sass', 'util:update:js', 'util:update:templates', done);
+	
+});
+
+gulp.task('util:update:sass', function(done){
+	
 	gulp.src('./src/scss/site.scss')
 	.pipe(replace(dateString, "@date		" + date))
 	.pipe(replace(projectString, "@project	" + packageConfig.name))
 	.pipe(replace(authorString, "@author		" + devConfig.developer))
 	.pipe(replace(versionString, "@version	" + packageConfig.version))
 	.pipe(replace(descString, "@desc		" + packageConfig.description))
-	.pipe(gulp.dest('./src/scss/')),
+	.pipe(gulp.dest('./src/scss/'))
+	.on('end', done);
+	
+});
+	
+gulp.task('util:update:js', function(done){
 	
 	gulp.src('./src/js/main.js')
 	.pipe(replace(dateString, "@date		" + date))
@@ -307,6 +318,19 @@ gulp.task('util:update', function(done){
 	.pipe(replace(versionString, "@version	" + packageConfig.version))
 	.pipe(replace(descString, "@desc		" + packageConfig.description))
 	.pipe(gulp.dest('./src/js/'))
+	.on('end', done);
+	
+});
+	
+gulp.task('util:update:templates', function(done){	
+	
+	gulp.src('./src/templates/**/*')
+	.pipe(replace(dateString, "@date		" + date))
+	.pipe(replace(projectString, "@project	" + packageConfig.name))
+	.pipe(replace(authorString, "@author		" + devConfig.developer))
+	.pipe(replace(versionString, "@version	" + packageConfig.version))
+	.pipe(replace(descString, "@desc		" + packageConfig.description))
+	.pipe(gulp.dest('./src/templates/'))
 	.on('end', done);
 	
 });
@@ -333,8 +357,8 @@ gulp.task('util:templates', function(done){
 
 gulp.task('watch', function() {
 	
-	gulp.watch(paths.sass, ['sass']);
-	gulp.watch(paths.js, ['js']);
-	gulp.watch(paths.templates, ['util:templates']);
+	gulp.watch(paths.sass, ['util:update:sass','sass']);
+	gulp.watch(paths.js, ['util:update:js','js']);
+	gulp.watch(paths.templates, ['util:update:templates', 'util:templates']);
 	
 });
