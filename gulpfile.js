@@ -17,9 +17,7 @@ var find = 			require('gulp-find');
 var concat = 		require('gulp-concat');
 var rename = 		require('gulp-rename');
 var replace = 		require('gulp-replace');
-
 var sourcemaps = 	require('gulp-sourcemaps');
-
 var contains = 		require('gulp-contains');
 var gulpSequence = 	require('gulp-sequence');
 var uglify = 		require('gulp-uglifyjs');
@@ -229,6 +227,7 @@ gulp.task('js:compile', function(done){
 gulp.task('js:vendor', function(done){
 	
 	gulp.src('./src/js/vendor/*.js')
+	.pipe(uglify())
     .pipe(gulp.dest('./dist/public_html/assets/js/vendor/'))
     .on('end', done);
 	
