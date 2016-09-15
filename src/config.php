@@ -11,9 +11,9 @@
 |
 */
 $config['app_version'] = '2.11.2';
-$admin_email = ''; /* enter your email address */
+$admin_email = '';
 
-$path = '/home/username'; /* insert account username */
+$path = 'home/username/';
 $public_path = $path.'/public_html';
 $url = 'http://'.$_SERVER['HTTP_HOST'];
 $assets = $url.'assets';

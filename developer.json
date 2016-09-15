@@ -1,9 +1,8 @@
 {
-	"projectName": "ee-boilerplate",
-	"author": "James W.",
+	"developer": "James W.",
+	"eeVersion" : "2.11.2",
 	"adminEmail": "james@fusionweb.co.uk",
 	"accountName": "boiler",
-	"encryptionKey": "MITTENS",
-	"versionNumber": "1.0.1"
+	"encryptionKey": "MITTENS"
 	
 }
