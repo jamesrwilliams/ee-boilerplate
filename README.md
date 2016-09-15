@@ -9,8 +9,8 @@ Boilerplate for Fusion ExpressionEngine web projects.
 3. Install packages: `$ npm install`
 4. Download EE files from [ellislab.com](https://store.ellislab.com/manage) and then unzip the source files into `dist/public_html`.
 5. Setup directory using `$ gulp config`
-6. Run the EE instaliation
-7. Finalise the instaliation with `$ gulp setup`
+6. Run the EE installation
+7. Finalise the installation with `$ gulp setup`
 
 ## Utility gulp tasks
 
