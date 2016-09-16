@@ -164,7 +164,7 @@ $config['censored_words'] = 'viagra|cialis';
 
 $config['enable_online_user_tracking'] = 'n';
 $config['enable_hit_tracking'] = 'n';
-$config['enable_entry_view_tracking'] = 'y';
+$config['enable_entry_view_tracking'] = 'n';
 $config['max_referrers'] = '0';
 $config['dynamic_tracking_disabling'] = '0';
 $config['log_referrers'] = 'n';
