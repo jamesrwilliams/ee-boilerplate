@@ -16,6 +16,7 @@ var sass = 			require('gulp-sass');
 var concat = 		require('gulp-concat');
 var cache = 		require('gulp-cached');
 var rename = 		require('gulp-rename');
+var randomstring =  require("randomstring");
 var changed = 		require('gulp-changed');
 var replace = 		require('gulp-replace');
 var gulpSequence = 	require('gulp-sequence');
@@ -37,6 +38,7 @@ var versionString 	= /@version( )?.*/g;
 var descString 		= /@desc( )?.*/g;
 
 var configVersion	= /\$config\['app_version'\]?.*/ig;
+var configEncrypt 	= /\$config\['encryption_key'\]?.*/ig;
 var configAdmin		= /\$admin_email = ''?.*/ig;
 var configPath		= /\$path = ''?.*/ig;
 var configSysPath	= /\$system_path = ''?.*/ig;
@@ -94,20 +96,20 @@ gulp.task('default', ['sass', 'js']);
 // -------------------------------------
 
 
-gulp.task('config', function(done){
+gulp.task('setup', function(done){
 	
 	gulpSequence(
 	
-		'config:move:system', 
-		'config:move:assets', 
-		'config:move:uploads',
-		'config:clear',
+		'setup:move:system', 
+		'setup:move:assets', 
+		'setup:move:uploads',
+		'setup:clear',
 		
 	done);
 	
 });
 
-gulp.task('config:move:system', function(done){
+gulp.task('setup:move:system', function(done){
 		
 	gulp.src('./dist/public_html/system/**/*')
 	.pipe(gulp.dest("./dist/system/"))
@@ -115,7 +117,7 @@ gulp.task('config:move:system', function(done){
 	
 });
 
-gulp.task('config:move:assets', function(done){
+gulp.task('setup:move:assets', function(done){
 	
 	gulp.src('./dist/public_html/images/**/*')
 	.pipe(gulp.dest("./dist/public_html/assets/"))
@@ -123,7 +125,7 @@ gulp.task('config:move:assets', function(done){
 	
 });
 
-gulp.task('config:move:uploads', function(done){
+gulp.task('setup:move:uploads', function(done){
 	
 	gulp.src('./dist/public_html/assets/uploads/')
 	.pipe(gulp.dest('./dist/public_html/'))
@@ -131,7 +133,7 @@ gulp.task('config:move:uploads', function(done){
 	
 });
 
-gulp.task('config:clear', function(){
+gulp.task('setup:clear', function(){
 	
 	return del([
 		
@@ -155,42 +157,25 @@ gulp.task('config:clear', function(){
 //
 // -------------------------------------
 
-gulp.task('setup', function(done){
+gulp.task('config', function(done){
 	
 	gulpSequence(
 	
-		'setup:update', 
-		'setup:move:config', 
+		'config:move:config',
+		'util:update',
 		'util:templates',
 		
 	done);
 	
 });
 
-gulp.task('setup:update', function(done){
-	
-	gulp.src('./src/config.php')
-	.pipe(replace(configVersion, "$config['app_version'] = '" + devConfig.eeVersion + "';"))
-	.pipe(replace(configAdmin, "$admin_email = '" + devConfig.adminEmail + "';"))
-	.pipe(replace(configPath, "$path = 'home/username/" + devConfig.accountName + "';"))
-	.pipe(gulp.dest('./src/')),
-	
-	gulp.src('./dist/public_html/index.php')
-	.pipe(replace(configSysPath, "$system_path = '../system';"))
-	.pipe(gulp.dest('./dist/public_html/'))
-	.on('end', done);
-	
-});
-
-gulp.task('setup:move:config', function(done){
+gulp.task('config:move:config', function(done){
 	
 	gulp.src('./src/config.php')
 	.pipe(gulp.dest('./dist/system/expressionengine/config/'))
 	.on('end', done);
 	
 });
-
-
 
 // -------------------------------------
 // Task: sass
@@ -298,7 +283,7 @@ gulp.task('js:vendor', function(done){
 gulp.task('util', function(done){
 	
 	// No Primary Task
-	console.log("\nHonk! Goose egg.\n");
+	console.log("\n  Honk! Goose egg. 'util' isn't a task on its own. Try:\n\n  util:bust 	- Add cache busting strings to the site.min.css and site.min.js files.\n  util:update 	- Updates the system settings with those in developer.json\n\n  For a full list of tasks run: gulp --tasks\n");
 	
 });
 
@@ -308,6 +293,22 @@ gulp.task('util:bust', function(done){
 	.pipe(replace(jsCacheBuster, '<script src="/assets/js/site.min.js?v=' + get_date() + '"></script>'))
 	.pipe(replace(cssCacheBuster, '<link href="/assets/css/site.min.css?v=' + get_date() + '" rel="stylesheet">'))
 	.pipe(gulp.dest('./src/templates/global.group'))
+	.on('end', done);
+	
+});
+
+gulp.task('util:update', function(done){
+	
+	gulp.src('./dist/system/expressionengine/config/config.php')
+	.pipe(replace(configVersion, "$config['app_version'] = '" + devConfig.eeVersion + "';"))
+	.pipe(replace(configEncrypt, "$config['encryption_key'] = '" + randomstring.generate({ length: 64, charset: 'alphanumeric', capitalization: 'uppercase' }) + "';"))
+	.pipe(replace(configAdmin, "$admin_email = '" + devConfig.adminEmail + "';"))
+	.pipe(replace(configPath, "$path = 'home/username/" + devConfig.accountName + "';"))
+	.pipe(gulp.dest('./dist/system/expressionengine/config/')),
+	
+	gulp.src('./dist/public_html/index.php')
+	.pipe(replace(configSysPath, "$system_path = '../system';"))
+	.pipe(gulp.dest('./dist/public_html/'))
 	.on('end', done);
 	
 });
