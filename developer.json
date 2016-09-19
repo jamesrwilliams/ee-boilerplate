@@ -3,6 +3,6 @@
 	"eeVersion" : "2.11.2",
 	"adminEmail": "james@fusionweb.co.uk",
 	"accountName": "boiler",
-	"encryptionKey": "MITTENS"
+	"cacheBustIsOn": true
 	
 }

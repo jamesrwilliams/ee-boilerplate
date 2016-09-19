@@ -164,6 +164,7 @@ gulp.task('config', function(done){
 		'config:move:config',
 		'util:update',
 		'util:templates',
+		'config:rm',
 		
 	done);
 	
@@ -174,6 +175,16 @@ gulp.task('config:move:config', function(done){
 	gulp.src('./src/config.php')
 	.pipe(gulp.dest('./dist/system/expressionengine/config/'))
 	.on('end', done);
+	
+});
+
+gulp.task('config:rm', function(){
+	
+	return del([
+		
+		'./src/config.php'
+	
+	]);
 	
 });
 
@@ -284,16 +295,38 @@ gulp.task('util', function(done){
 	
 	// No Primary Task
 	console.log("\n  Honk! Goose egg. 'util' isn't a task on its own. Try:\n\n  util:bust 	- Add cache busting strings to the site.min.css and site.min.js files.\n  util:update 	- Updates the system settings with those in developer.json\n\n  For a full list of tasks run: gulp --tasks\n");
-	
+
 });
 
 gulp.task('util:bust', function(done){
 	
-	gulp.src('./src/templates/global.group/_layout.html')
-	.pipe(replace(jsCacheBuster, '<script src="/assets/js/site.min.js?v=' + get_date() + '"></script>'))
-	.pipe(replace(cssCacheBuster, '<link href="/assets/css/site.min.css?v=' + get_date() + '" rel="stylesheet">'))
-	.pipe(gulp.dest('./src/templates/global.group'))
-	.on('end', done);
+	 gulpSequence('util:bust:js', 'util:bust:css', done);
+	
+});
+
+gulp.task('util:bust:js', function(done){
+	
+	if(devConfig.cacheBustIsOn){
+	
+		gulp.src('./src/templates/layouts.group/_global.html')
+		.pipe(replace(jsCacheBuster, '<script src="/assets/js/site.min.js?v=' + get_date() + '"></script>'))
+		.pipe(gulp.dest('./src/templates/layouts.group'))
+		.on('end', done);
+		
+	}
+	
+});
+
+gulp.task('util:bust:css', function(done){
+		
+	if(devConfig.cacheBustIsOn){
+	
+		gulp.src('./src/templates/layouts.group/_global.html')
+		.pipe(replace(cssCacheBuster, '<link href="/assets/css/site.min.css?v=' + get_date() + '" rel="stylesheet">'))
+		.pipe(gulp.dest('./src/templates/layouts.group'))
+		.on('end', done);
+	
+	}
 	
 });
 
@@ -341,8 +374,8 @@ gulp.task('util:templates', function(done){
 
 gulp.task('watch', function() {
 	
-	gulp.watch(paths.sass, ['sass']);
-	gulp.watch(paths.js, ['js']);
+	gulp.watch(paths.sass, ['util:bust:css','sass']);
+	gulp.watch(paths.js, ['util:bust:js','js']);
 	gulp.watch(paths.templates, ['util:templates']);
 	
 });
