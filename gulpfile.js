@@ -13,15 +13,16 @@
 var gulp = 			require('gulp');
 var gutil = 		require('gulp-util');
 var sass = 			require('gulp-sass');
-var find = 			require('gulp-find');
 var concat = 		require('gulp-concat');
+var cache = 		require('gulp-cached');
 var rename = 		require('gulp-rename');
+var randomstring =  require("randomstring");
+var changed = 		require('gulp-changed');
 var replace = 		require('gulp-replace');
-var sourcemaps = 	require('gulp-sourcemaps');
-var contains = 		require('gulp-contains');
 var gulpSequence = 	require('gulp-sequence');
 var uglify = 		require('gulp-uglifyjs');
 var cleanCSS = 		require('gulp-clean-css');
+var sourcemaps = 	require('gulp-sourcemaps');
 var bulkSass = 		require('gulp-sass-bulk-import');
 
 var del = 			require('del');
@@ -30,15 +31,6 @@ var vinylPaths = 	require('vinyl-paths');
 var devConfig = 	require('./developer.json');
 var packageConfig = require('./package.json');
 
-var today = new Date;
-var dd = today.getDate(); 
-var mm = today.getMonth()+1;
-if(mm < 10){ mm = "0" + mm; }
-var yyyy = today.getFullYear();
-
-var date = dd + "/" + mm + "/" + yyyy + " @ " + today.getHours() + ":" + today.getMinutes();
-var date_com = yyyy + mm + dd + today.getHours() + today.getMinutes();
-
 var dateString 		= /@date( )?.*/g;
 var projectString 	= /@project( )?.*/g;
 var authorString 	= /@author( )?.*/g;
@@ -46,6 +38,7 @@ var versionString 	= /@version( )?.*/g;
 var descString 		= /@desc( )?.*/g;
 
 var configVersion	= /\$config\['app_version'\]?.*/ig;
+var configEncrypt 	= /\$config\['encryption_key'\]?.*/ig;
 var configAdmin		= /\$admin_email = ''?.*/ig;
 var configPath		= /\$path = ''?.*/ig;
 var configSysPath	= /\$system_path = ''?.*/ig;
@@ -53,6 +46,26 @@ var configSysPath	= /\$system_path = ''?.*/ig;
 var jsCacheBuster 	= /\<script src="\/assets\/js\/site.min.js?.*/ig;
 var cssCacheBuster  = /\<link href="\/assets\/css\/site.min.css?.*/ig;
 
+function get_date(format){
+	
+	var today = new Date;
+	var dd = today.getDate(); 
+	var mm = today.getMonth()+1; if(mm < 10){ mm = "0" + mm; }
+	var hours = today.getHours(); if(hours < 10){hours = "0" + hours; }
+	var mins = today.getMinutes(); if(mins < 10){ mins = "0" + mins; }
+	var yyyy = today.getFullYear();
+	
+	if(format === 'human'){
+		
+		return dd + "/" + mm + "/" + yyyy + " @ " + hours + ":" + mins;
+		
+	}else{
+		
+		return yyyy + mm + dd + hours + mins;
+	
+	}
+	
+}
 
 /* Set paths to be watched for gulp watch */
 
@@ -83,20 +96,20 @@ gulp.task('default', ['sass', 'js']);
 // -------------------------------------
 
 
-gulp.task('config', function(done){
+gulp.task('setup', function(done){
 	
 	gulpSequence(
 	
-		'config:move:system', 
-		'config:move:assets', 
-		'config:move:uploads',
-		'config:clear',
+		'setup:move:system', 
+		'setup:move:assets', 
+		'setup:move:uploads',
+		'setup:clear',
 		
 	done);
 	
 });
 
-gulp.task('config:move:system', function(done){
+gulp.task('setup:move:system', function(done){
 		
 	gulp.src('./dist/public_html/system/**/*')
 	.pipe(gulp.dest("./dist/system/"))
@@ -104,7 +117,7 @@ gulp.task('config:move:system', function(done){
 	
 });
 
-gulp.task('config:move:assets', function(done){
+gulp.task('setup:move:assets', function(done){
 	
 	gulp.src('./dist/public_html/images/**/*')
 	.pipe(gulp.dest("./dist/public_html/assets/"))
@@ -112,7 +125,7 @@ gulp.task('config:move:assets', function(done){
 	
 });
 
-gulp.task('config:move:uploads', function(done){
+gulp.task('setup:move:uploads', function(done){
 	
 	gulp.src('./dist/public_html/assets/uploads/')
 	.pipe(gulp.dest('./dist/public_html/'))
@@ -120,7 +133,7 @@ gulp.task('config:move:uploads', function(done){
 	
 });
 
-gulp.task('config:clear', function(){
+gulp.task('setup:clear', function(){
 	
 	return del([
 		
@@ -144,42 +157,25 @@ gulp.task('config:clear', function(){
 //
 // -------------------------------------
 
-gulp.task('setup', function(done){
+gulp.task('config', function(done){
 	
 	gulpSequence(
 	
-		'setup:update', 
-		'setup:move:config', 
+		'config:move:config',
+		'util:update',
 		'util:templates',
 		
 	done);
 	
 });
 
-gulp.task('setup:update', function(done){
-	
-	gulp.src('./src/config.php')
-	.pipe(replace(configVersion, "$config['app_version'] = '" + devConfig.eeVersion + "';"))
-	.pipe(replace(configAdmin, "$admin_email = '" + devConfig.adminEmail + "';"))
-	.pipe(replace(configPath, "$path = 'home/username/" + devConfig.accountName + "';"))
-	.pipe(gulp.dest('./src/')),
-	
-	gulp.src('./dist/public_html/index.php')
-	.pipe(replace(configSysPath, "$system_path = '../system';"))
-	.pipe(gulp.dest('./dist/public_html/'))
-	.on('end', done);
-	
-});
-
-gulp.task('setup:move:config', function(done){
+gulp.task('config:move:config', function(done){
 	
 	gulp.src('./src/config.php')
 	.pipe(gulp.dest('./dist/system/expressionengine/config/'))
 	.on('end', done);
 	
 });
-
-
 
 // -------------------------------------
 // Task: sass
@@ -196,6 +192,11 @@ gulp.task('setup:move:config', function(done){
 gulp.task('sass', function(done) {
 		
 	gulp.src('./src/scss/site.scss')
+	.pipe(replace(dateString, "@date		" + get_date('human')))
+	.pipe(replace(projectString, "@project	" + packageConfig.name))
+	.pipe(replace(authorString, "@author		" + devConfig.developer))
+	.pipe(replace(versionString, "@version	" + packageConfig.version))
+	.pipe(replace(descString, "@desc		" + packageConfig.description))
 	.pipe(bulkSass())
 	.pipe(sourcemaps.init())
 	.pipe(sass({
@@ -238,6 +239,11 @@ gulp.task('js', function(done) {
 gulp.task('js:compile', function(done){
 	
 	gulp.src('./src/js/*.js')
+	.pipe(replace(dateString, "@date		" + get_date('human')))
+	.pipe(replace(projectString, "@project	" + packageConfig.name))
+	.pipe(replace(authorString, "@author		" + devConfig.developer))
+	.pipe(replace(versionString, "@version	" + packageConfig.version))
+	.pipe(replace(descString, "@desc		" + packageConfig.description))
     .pipe(concat('site.js'))
     .pipe(uglify('site.min.js'))
     .pipe(sourcemaps.init())
@@ -255,6 +261,7 @@ gulp.task('js:compile', function(done){
 gulp.task('js:vendor', function(done){
 	
 	gulp.src('./src/js/vendor/*.js')
+	.pipe(cache('js:vendor'))
 	.pipe(uglify())
     .pipe(gulp.dest('./dist/public_html/assets/js/vendor/'))
     .on('end', done);
@@ -276,15 +283,15 @@ gulp.task('js:vendor', function(done){
 gulp.task('util', function(done){
 	
 	// No Primary Task
-	console.log("\nHonk! Goose egg.\n");
+	console.log("\n  Honk! Goose egg. 'util' isn't a task on its own. Try:\n\n  util:bust 	- Add cache busting strings to the site.min.css and site.min.js files.\n  util:update 	- Updates the system settings with those in developer.json\n\n  For a full list of tasks run: gulp --tasks\n");
 	
 });
 
 gulp.task('util:bust', function(done){
 	
 	gulp.src('./src/templates/global.group/_layout.html')
-	.pipe(replace(jsCacheBuster, '<script src="/assets/js/site.min.js?v=' + date_com + '"></script>'))
-	.pipe(replace(cssCacheBuster, '<link href="/assets/css/site.min.css?v=' + date_com + '" rel="stylesheet">'))
+	.pipe(replace(jsCacheBuster, '<script src="/assets/js/site.min.js?v=' + get_date() + '"></script>'))
+	.pipe(replace(cssCacheBuster, '<link href="/assets/css/site.min.css?v=' + get_date() + '" rel="stylesheet">'))
 	.pipe(gulp.dest('./src/templates/global.group'))
 	.on('end', done);
 	
@@ -292,45 +299,16 @@ gulp.task('util:bust', function(done){
 
 gulp.task('util:update', function(done){
 	
-	gulpSequence('util:update:sass', 'util:update:js', 'util:update:templates', done);
+	gulp.src('./dist/system/expressionengine/config/config.php')
+	.pipe(replace(configVersion, "$config['app_version'] = '" + devConfig.eeVersion + "';"))
+	.pipe(replace(configEncrypt, "$config['encryption_key'] = '" + randomstring.generate({ length: 64, charset: 'alphanumeric', capitalization: 'uppercase' }) + "';"))
+	.pipe(replace(configAdmin, "$admin_email = '" + devConfig.adminEmail + "';"))
+	.pipe(replace(configPath, "$path = 'home/username/" + devConfig.accountName + "';"))
+	.pipe(gulp.dest('./dist/system/expressionengine/config/')),
 	
-});
-
-gulp.task('util:update:sass', function(done){
-	
-	gulp.src('./src/scss/site.scss')
-	.pipe(replace(dateString, "@date		" + date))
-	.pipe(replace(projectString, "@project	" + packageConfig.name))
-	.pipe(replace(authorString, "@author		" + devConfig.developer))
-	.pipe(replace(versionString, "@version	" + packageConfig.version))
-	.pipe(replace(descString, "@desc		" + packageConfig.description))
-	.pipe(gulp.dest('./src/scss/'))
-	.on('end', done);
-	
-});
-	
-gulp.task('util:update:js', function(done){
-	
-	gulp.src('./src/js/main.js')
-	.pipe(replace(dateString, "@date		" + date))
-	.pipe(replace(projectString, "@project	" + packageConfig.name))
-	.pipe(replace(authorString, "@author		" + devConfig.developer))
-	.pipe(replace(versionString, "@version	" + packageConfig.version))
-	.pipe(replace(descString, "@desc		" + packageConfig.description))
-	.pipe(gulp.dest('./src/js/'))
-	.on('end', done);
-	
-});
-	
-gulp.task('util:update:templates', function(done){	
-	
-	gulp.src('./src/templates/**/*')
-	.pipe(replace(dateString, "@date		" + date))
-	.pipe(replace(projectString, "@project	" + packageConfig.name))
-	.pipe(replace(authorString, "@author		" + devConfig.developer))
-	.pipe(replace(versionString, "@version	" + packageConfig.version))
-	.pipe(replace(descString, "@desc		" + packageConfig.description))
-	.pipe(gulp.dest('./src/templates/'))
+	gulp.src('./dist/public_html/index.php')
+	.pipe(replace(configSysPath, "$system_path = '../system';"))
+	.pipe(gulp.dest('./dist/public_html/'))
 	.on('end', done);
 	
 });
@@ -338,6 +316,12 @@ gulp.task('util:update:templates', function(done){
 gulp.task('util:templates', function(done){
 	
 	gulp.src('./src/templates/**/*')
+	.pipe(changed('./dist/app/templates/default_site/'))
+	.pipe(replace(dateString, "@date		" + get_date('human')))
+	.pipe(replace(projectString, "@project	" + packageConfig.name))
+	.pipe(replace(authorString, "@author		" + devConfig.developer))
+	.pipe(replace(versionString, "@version	" + packageConfig.version))
+	.pipe(replace(descString, "@desc		" + packageConfig.description))
 	.pipe(gulp.dest('./dist/app/templates/default_site/'))
 	.on('end', done);
 	
@@ -357,8 +341,8 @@ gulp.task('util:templates', function(done){
 
 gulp.task('watch', function() {
 	
-	gulp.watch(paths.sass, ['util:update:sass','sass']);
-	gulp.watch(paths.js, ['util:update:js','js']);
-	gulp.watch(paths.templates, ['util:update:templates', 'util:templates']);
+	gulp.watch(paths.sass, ['sass']);
+	gulp.watch(paths.js, ['js']);
+	gulp.watch(paths.templates, ['util:templates']);
 	
 });
