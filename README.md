@@ -12,11 +12,12 @@ Boilerplate for Fusion ExpressionEngine web projects.
 6. Run the EE installation
 7. Finalise the installation with `$ gulp config`
 
+## Updating Boilerplate
+
+To update the boilerplate to a more recent version simply download both the `package.json` and `developer.json` files to your project folder and run: `$ npm install`
+
 ## Utility gulp tasks
 
 `$ gulp util:bust` - Add cache busting strings to the site.min.css and site.min.js files in /dist (note: you will have to run command again after further template edits).
 
 `$ gulp util:update` - Update the system config details with those in developer.json.
-
-
-
