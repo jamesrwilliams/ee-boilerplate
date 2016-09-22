@@ -271,8 +271,7 @@ gulp.task('js:compile', function(done){
 
 gulp.task('js:vendor', function(done){
 	
-	gulp.src('./src/js/vendor/*.js')
-	.pipe(cache('js:vendor'))
+	gulp.src('./src/js/vendor/**/*.js')
 	.pipe(uglify())
     .pipe(gulp.dest('./dist/public_html/assets/js/vendor/'))
     .on('end', done);
